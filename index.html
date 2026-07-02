@@ -170,7 +170,7 @@
       const recipient = "interline@arkia.co.il"; // <-- Update target email dispatch address here
       const subject = "הזמנת כרטיסים יפתח זיו, מספר עובד 33410";
 
-      const emailBody = `שלום רב,\n\nמעונין להזמין כרטיסים ${currentTripType} למשפחתי לפי הפרטים הבאים:\n\nהפרטים:\nשמי: יפתח זיו\nמס' עובד: 33410\nשם הנוסעים:\n ${passengersText}\n\nיעד: ${dest}\n\n${flightDetailsText}\n\nאשראי: 1620\nCVV: 249\n\nתודה רבה,\nיפתח זיו`;
+      const emailBody = `שלום רב,\n\nמעונין להזמין כרטיסים ${currentTripType} למשפחתי לפי הפרטים הבאים:\n\nהפרטים:\nשמי: יפתח זיו\nמס' עובד: 33410\n\nשם הנוסעים:\n ${passengersText} \n\nיעד: ${dest}\n\n${flightDetailsText}\n\nאשראי: 1620\nCVV: 249\n\nתודה רבה,\nיפתח זיו`;
 
       const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
       
