@@ -169,8 +169,26 @@
 
       const recipient = "interline@arkia.co.il"; // <-- Update target email dispatch address here
       const subject = "הזמנת כרטיסים יפתח זיו, מספר עובד 33410";
+      // Perfectly spaced Hebrew template matching your layout request
+      const emailBody = `שלום רב,
 
-      const emailBody = `שלום רב,\n\nמעונין להזמין כרטיסים ${currentTripType} למשפחתי לפי הפרטים הבאים:\n\nהפרטים:\nשמי: יפתח זיו\nמס' עובד: 33410\n\nשם הנוסעים:\n ${passengersText} \n\nיעד: ${dest}\n\n${flightDetailsText}\n\nאשראי: 1620\nCVV: 249\n\nתודה רבה,\nיפתח זיו`;
+מעונין להזמין כרטיסים ${currentTripType} למשפחתי לפי הפרטים הבאים:
+
+הפרטים:
+שמי: יפתח זיו
+מס' עובד: 33410
+שם הנוסעים:
+${passengersText}
+
+יעד: ${dest}
+${flightDetailsText}
+
+אשראי: 1620
+CVV: 249
+
+תודה רבה,
+יפתח זיו`;
+      //const emailBody = `שלום רב,\n\nמעונין להזמין כרטיסים ${currentTripType} למשפחתי לפי הפרטים הבאים:\n\nהפרטים:\nשמי: יפתח זיו\nמס' עובד: 33410\n\nשם הנוסעים:\n ${passengersText} \n\nיעד: ${dest}\n\n${flightDetailsText}\n\nאשראי: 1620\nCVV: 249\n\nתודה רבה,\nיפתח זיו`;
 
       const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
       
