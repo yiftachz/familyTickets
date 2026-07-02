@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הזמנת כרטיסים</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom style to ensure the English text layout looks clean inside the RTL block */
+    .ltr-text { direction: ltr; text-align: left; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6 space-y-6">
+    <div class="text-center">
+      <h1 class="text-2xl font-bold tracking-tight text-white">הזמנת כרטיסי טיסה</h1>
+      <p class="text-slate-400 text-sm mt-1">יפתח זיו | מס' עובד: 33410</p>
+    </div>
+
+    <form id="ticketForm" class="space-y-5">
+      
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">סוג הטיסה</label>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="button" id="btnOneWay" onclick="setTripType('כיוון אחד')" 
+                  class="trip-type-btn bg-blue-600 border border-blue-500 rounded-xl py-3 text-center font-medium text-white transition active:scale-[0.97]">
+            כיוון אחד
+          </button>
+          <button type="button" id="btnReturn" onclick="setTripType('הלוך ושוב')" 
+                  class="trip-type-btn bg-slate-700 border border-slate-600 rounded-xl py-3 text-center font-medium text-slate-300 transition active:scale-[0.97]">
+            הלוך ושוב
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">שם הנוסעים</label>
+        <div class="grid grid-cols-2 gap-3 ltr-text">
+          <button type="button" onclick="togglePassenger(this)" data-name="YIFTACH ZIV" class="passenger-chip bg-slate-700 border border-slate-600 rounded-xl py-2.5 text-center text-sm font-medium transition active:scale-[0.97]">YIFTACH ZIV</button>
+          <button type="button" onclick="togglePassenger(this)" data-name="GABI ILOVITZ ZIV" class="passenger-chip bg-slate-700 border border-slate-600 rounded-xl py-2.5 text-center text-sm font-medium transition active:scale-[0.97]">GABI ZIV</button>
+          <button type="button" onclick="togglePassenger(this)" data-name="TAMAR ZIV" class="passenger-chip bg-slate-700 border border-slate-600 rounded-xl py-2.5 text-center text-sm font-medium transition active:scale-[0.97]">TAMAR ZIV</button>
+          <button type="button" onclick="togglePassenger(this)" data-name="OMER AHARON ZIV" class="passenger-chip bg-slate-700 border border-slate-600 rounded-xl py-2.5 text-center text-sm font-medium transition active:scale-[0.97]">OMER ZIV</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">יעד</label>
+        <input type="text" id="dest" required placeholder="לדוגמה: לונדון" 
+               class="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">מספר טיסה</label>
+          <input type="number" id="num1" required placeholder="315" 
+                 class="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">תאריך</label>
+          <input type="text" id="date1" required placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDateInput(this)"
+                 class="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition ltr-text text-center">
+        </div>
+      </div>
+
+      <div id="returnFields" class="grid grid-cols-2 gap-3 hidden animate-fade-in">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">מספר טיסת חזור</label>
+          <input type="number" id="num2" placeholder="316" 
+                 class="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">תאריך חזור</label>
+          <input type="text" id="date2" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDateInput(this)"
+                 class="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition ltr-text text-center">
+        </div>
+      </div>
+
+      <button type="button" onclick="generateAndLaunch()" 
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl py-4 transition shadow-lg shadow-blue-600/20 active:scale-[0.98] text-lg mt-2">
+        פתח טיוטה ב-Gmail
+      </button>
+    </form>
+  </div>
+
+  <script>
+    let currentTripType = "כיוון אחד";
+
+    function setTripType(type) {
+      currentTripType = type;
+      const btnOneWay = document.getElementById('btnOneWay');
+      const btnReturn = document.getElementById('btnReturn');
+      const returnFields = document.getElementById('returnFields');
+      const num2 = document.getElementById('num2');
+      const date2 = document.getElementById('date2');
+
+      if (type === "כיוון אחד") {
+        // Toggle UI buttons
+        btnOneWay.className = "trip-type-btn bg-blue-600 border border-blue-500 rounded-xl py-3 text-center font-medium text-white transition active:scale-[0.97]";
+        btnReturn.className = "trip-type-btn bg-slate-700 border border-slate-600 rounded-xl py-3 text-center font-medium text-slate-300 transition active:scale-[0.97]";
+        // Hide return fields
+        returnFields.classList.add('hidden');
+        num2.removeAttribute('required');
+        date2.removeAttribute('required');
+      } else {
+        // Toggle UI buttons
+        btnReturn.className = "trip-type-btn bg-blue-600 border border-blue-500 rounded-xl py-3 text-center font-medium text-white transition active:scale-[0.97]";
+        btnOneWay.className = "trip-type-btn bg-slate-700 border border-slate-600 rounded-xl py-3 text-center font-medium text-slate-300 transition active:scale-[0.97]";
+        // Show return fields
+        returnFields.classList.remove('hidden');
+        num2.setAttribute('required', '');
+        date2.setAttribute('required', '');
+      }
+    }
+
+    function togglePassenger(btn) {
+      btn.classList.toggle('bg-blue-600');
+      btn.classList.toggle('border-blue-500');
+      btn.classList.toggle('text-white');
+      btn.classList.toggle('bg-slate-700');
+      btn.classList.toggle('border-slate-600');
+      btn.classList.toggle('selected');
+    }
+
+    // Custom text masking to force DD/MM/YYYY formatting automatically as you type
+    function formatDateInput(input) {
+      let value = input.value.replace(/\D/g, ''); // Remove non-digits
+      if (value.length > 2 && value.length <= 4) {
+        value = value.slice(0, 2) + '/' + value.slice(2);
+      } else if (value.length > 4) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4, 8);
+      }
+      input.value = value;
+    }
+
+    function generateAndLaunch() {
+      const dest = document.getElementById('dest').value;
+      const num1 = document.getElementById('num1').value;
+      const date1 = document.getElementById('date1').value;
+      
+      // Validation basics
+      if (!dest || !num1 || !date1) {
+        alert("נא למלא את כל שדות החובה.");
+        return;
+      }
+      if (currentTripType === "הלוך ושוב") {
+        if (!document.getElementById('num2').value || !document.getElementById('date2').value) {
+          alert("נא למלא מס' טיסה ותאריך עבור טיסת החזור.");
+          return;
+        }
+      }
+
+      // Collect active passengers
+      const selectedChips = document.querySelectorAll('.passenger-chip.selected');
+      if (selectedChips.length === 0) {
+        alert("נא לבחור לפחות נוסע אחד.");
+        return;
+      }
+      const passengersArray = Array.from(selectedChips).map(chip => chip.getAttribute('data-name'));
+      const passengersText = passengersArray.join(' / ');
+
+      // Build text for dynamic fields based on trip type
+      let flightDetailsText = `מספר טיסה: ${num1}\nתאריך: ${date1}`;
+      if (currentTripType === "הלוך ושוב") {
+        const num2 = document.getElementById('num2').value;
+        const date2 = document.getElementById('date2').value;
+        flightDetailsText += `\nמספר טיסת חזור: ${num2}\nתאריך חזור: ${date2}`;
+      }
+
+      // Target recipient configuration
+      const recipient = "interline@arkia.co.il"; // <-- PUT TARGET DISPATCH EMAIL HERE
+      const subject = "הזמנת כרטיסים יפתח זיו, מספר עובד 33410";
+
+      // Perfectly formatted Hebrew message string matching requirements
+      const emailBody = `שלום רב,
+
+מעונין להזמין כרטיסים ${currentTripType} למשפחתי לפי הפרטים הבאים:
+
+הפרטים:
+שמי: יפתח זיו
+מס' עובד: 33410
+שם הנוסעים: [${passengersText}]
+יעד: ${dest}
+
+${flightDetailsText}
+
+אשראי: 1620
+CVV: 249
+
+תודה רבה,
+יפתח זיו`;
+
+      // Construct native deep link string with correct encoding hooks
+      const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Fire it right into Android system intent handover
+      window.location.href = mailtoUrl;
+    }
+  </script>
+</body>
+</html>
